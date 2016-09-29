@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otrs_package version="1.0">
+    <Name>Znuny4OTRS-GIArticleSend</Name>
+    <Version>1.0.0</Version>
+    <Framework>5.0.x</Framework>
+    <PackageRequired Version="5.0.12">Znuny4OTRS-Repo</PackageRequired>
+    <Vendor>Znuny GmbH</Vendor>
+    <URL>http://znuny.com/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <Description Lang="en">This package contains the functionality to send GenericInterface articles.</Description>
+    <Description Lang="de">Dieses Paket enthält die Funktionalität um GenericInterface Artikel zu versenden.</Description>
+    <Filelist>
+        <File Permission="644" Location="Custom/Kernel/GenericInterface/Operation/Ticket/Common.pm"/>
+        <File Permission="644" Location="Custom/Kernel/GenericInterface/Operation/Ticket/TicketCreate.pm"/>
+        <File Permission="644" Location="Custom/Kernel/GenericInterface/Operation/Ticket/TicketUpdate.pm"/>
+        <File Permission="644" Location="scripts/test/GenericInterface/Operation/Ticket/TicketCreate.t"/>
+        <File Permission="644" Location="scripts/test/GenericInterface/Operation/Ticket/TicketUpdate.t"/>
+    </Filelist>
+</otrs_package>
