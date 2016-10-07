@@ -13,7 +13,8 @@ job_unit_otrs_Znuny4OTRSGIArticleSend:
     - su -c "git clone https://github.com/OTRS/module-tools.git" -s /bin/bash otrs
     - su -c "module-tools/link.pl . /opt/otrs/" -s /bin/bash otrs
     - su -c "perl /opt/otrs/bin/otrs.Console.pl Znuny4OTRS::AdvancedPackageManager::InstallSOPM /opt/otrs/Znuny4OTRS-GIArticleSend.sopm" -s /bin/bash otrs
-    - su -c "perl /opt/otrs/bin/otrs.Console.pl Dev::UnitTest::Run --verbose --test Znuny4OTRSGIArticleSend" -s /bin/bash otrs
+    - su -c "perl /opt/otrs/bin/otrs.Console.pl Dev::UnitTest::Run --verbose --test GenericInterface/Operation/Ticket/TicketCreate" -s /bin/bash otrs
+    - su -c "perl /opt/otrs/bin/otrs.Console.pl Dev::UnitTest::Run --verbose --test GenericInterface/Operation/Ticket/TicketUpdate" -s /bin/bash otrs
 
 job_deploy_otrs_Znuny4OTRSGIArticleSend:
   stage: deploy

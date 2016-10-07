@@ -2076,8 +2076,8 @@ sub _TicketUpdate {
                 for my $Attachment ( @{$AttachmentList} ) {
 
                     push @NewAttachments, {
-                        %{ $Param{Attachment} },
-                        Content => MIME::Base64::decode_base64( $Param{Attachment}->{Content} ),
+                        %{ $Attachment },
+                        Content => MIME::Base64::decode_base64( $Attachment->{Content} ),
                     };
                 }
 

@@ -105,6 +105,21 @@ $ConfigObject->Set(
     Value => 1,
 );
 
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
+# disable mail dispatch
+$Helper->ConfigSettingChange(
+    Valid => 1,
+    Key   => 'SendmailModule',
+    Value => 'Kernel::System::Email::DoNotSendEmail',
+);
+$ConfigObject->Set(
+    Key   => 'SendmailModule',
+    Value => 'Kernel::System::Email::DoNotSendEmail',
+);
+# ---
+
 # check if SSL Certificate verification is disabled
 $Self->Is(
     $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME},
@@ -3906,6 +3921,189 @@ my @Tests        = (
         },
         Operation => 'TicketCreate',
     },
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
+    {
+        Name             => 'Ticket with a sent article but missing "To"',
+        SuccessRequest   => 1,
+        SuccessCreate    => 0,
+        ExternalCustomer => 1,
+        RequestData      => {
+            Ticket => {
+                Title        => 'Ticket Title',
+                CustomerUser => 'someone@somehots.com',
+                Queue        => $Queues[0]->{Name},
+                Type         => $TypeData{Name},
+                State        => $StateData{Name},
+                Priority     => $PriorityData{Name},
+                Owner        => $TestOwnerLogin,
+                Responsible  => $TestResponsibleLogin,
+                PendingTime  => {
+                    Year   => 2012,
+                    Month  => 12,
+                    Day    => 16,
+                    Hour   => 20,
+                    Minute => 48,
+                },
+            },
+            Article => {
+                Subject                         => 'Article subject äöüßÄÖÜ€ис',
+                Body                            => 'Article body !"Â§$%&/()=?Ã*ÃÃL:L@,.-',
+                AutoResponseType                => 'auto reply',
+                ArticleType                     => 'email-external',
+                SenderType                      => 'agent',
+                From                            => 'enjoy@otrs.com',
+                ContentType                     => 'text/plain; charset=UTF8',
+                HistoryType                     => 'NewTicket',
+                HistoryComment                  => '% % ',
+                TimeUnit                        => 25,
+                ForceNotificationToUserID       => [1],
+                ExcludeNotificationToUserID     => [1],
+                ExcludeMuteNotificationToUserID => [1],
+                ArticleSend                     => 1,
+#                 To                              => 'root@localhost',
+            },
+            DynamicField => {
+                Name  => $DynamicFieldDateTimeConfig{Name},
+                Value => '2012-01-17 12:40:00',
+            },
+            Attachment => {
+                Content     => 'VGhpcyBpcyBhIHRlc3QgdGV4dC4=',
+                ContentType => 'text/plain; charset=UTF8',
+                Filename    => 'Test.txt',
+                Disposition => 'attachment',
+            },
+        },
+        ExpectedData => {
+            Data => {
+                Error => {
+                    ErrorCode    => 'TicketCreate.InvalidParameter',
+                    ErrorMessage => 'TicketCreate: Article->To parameter must be a valid email address when Article->ArticleSend is set!',
+                }
+            },
+            Success => 1
+        },
+        Operation => 'TicketCreate',
+    },
+#     {
+#         Name             => 'Ticket with a sent article but invalid "To"',
+#         SuccessRequest   => 1,
+#         SuccessCreate    => 0,
+#         ExternalCustomer => 1,
+#         RequestData      => {
+#             Ticket => {
+#                 Title        => 'Ticket Title',
+#                 CustomerUser => 'someone@somehots.com',
+#                 Queue        => $Queues[0]->{Name},
+#                 Type         => $TypeData{Name},
+#                 State        => $StateData{Name},
+#                 Priority     => $PriorityData{Name},
+#                 Owner        => $TestOwnerLogin,
+#                 Responsible  => $TestResponsibleLogin,
+#                 PendingTime  => {
+#                     Year   => 2012,
+#                     Month  => 12,
+#                     Day    => 16,
+#                     Hour   => 20,
+#                     Minute => 48,
+#                 },
+#             },
+#             Article => {
+#                 Subject                         => 'Article subject äöüßÄÖÜ€ис',
+#                 Body                            => 'Article body !"Â§$%&/()=?Ã*ÃÃL:L@,.-',
+#                 AutoResponseType                => 'auto reply',
+#                 ArticleType                     => 'email-external',
+#                 SenderType                      => 'agent',
+#                 From                            => 'enjoy@otrs.com',
+#                 Charset                         => 'utf8',
+#                 MimeType                        => 'text/plain',
+#                 HistoryType                     => 'NewTicket',
+#                 HistoryComment                  => '% % ',
+#                 TimeUnit                        => 25,
+#                 ForceNotificationToUserID       => [1],
+#                 ExcludeNotificationToUserID     => [1],
+#                 ExcludeMuteNotificationToUserID => [1],
+#                 ArticleSend                     => 1,
+#                 To                              => 'invalid-email-address',
+#             },
+#             DynamicField => {
+#                 Name  => $DynamicFieldDateTimeConfig{Name},
+#                 Value => '2012-01-17 12:40:00',
+#             },
+#             Attachment => {
+#                 Content     => 'VGhpcyBpcyBhIHRlc3QgdGV4dC4=',
+#                 ContentType => 'text/plain; charset=UTF8',
+#                 Filename    => 'Test.txt',
+#                 Disposition => 'attachment',
+#             },
+#         },
+#         ExpectedData => {
+#             Data => {
+#                 Error => {
+#                     ErrorCode    => 'TicketCreate.InvalidParameter',
+#                     ErrorMessage => 'TicketCreate: Article->To parameter must be a valid email address when Article->ArticleSend is set!',
+#                 }
+#             },
+#             Success => 0,
+#         },
+#         Operation => 'TicketCreate',
+#     },
+    {
+        Name             => 'Ticket with a sent article',
+        SuccessRequest   => 1,
+        SuccessCreate    => 1,
+        ExternalCustomer => 1,
+        RequestData      => {
+            Ticket => {
+                Title        => 'Ticket Title',
+                CustomerUser => 'someone@somehots.com',
+                Queue        => $Queues[0]->{Name},
+                Type         => $TypeData{Name},
+                State        => $StateData{Name},
+                Priority     => $PriorityData{Name},
+                Owner        => $TestOwnerLogin,
+                Responsible  => $TestResponsibleLogin,
+                PendingTime  => {
+                    Year   => 2012,
+                    Month  => 12,
+                    Day    => 16,
+                    Hour   => 20,
+                    Minute => 48,
+                },
+            },
+            Article => {
+                Subject                         => 'Article subject äöüßÄÖÜ€ис',
+                Body                            => 'Article body !"Â§$%&/()=?Ã*ÃÃL:L@,.-',
+                AutoResponseType                => 'auto reply',
+                ArticleType                     => 'email-external',
+                SenderType                      => 'agent',
+                From                            => 'enjoy@otrs.com',
+                Charset                         => 'utf8',
+                MimeType                        => 'text/plain',
+                HistoryType                     => 'NewTicket',
+                HistoryComment                  => '% % ',
+                TimeUnit                        => 25,
+                ForceNotificationToUserID       => [1],
+                ExcludeNotificationToUserID     => [1],
+                ExcludeMuteNotificationToUserID => [1],
+                ArticleSend                     => 1,
+                To                              => 'root@localhost',
+            },
+            DynamicField => {
+                Name  => $DynamicFieldDateTimeConfig{Name},
+                Value => '2012-01-17 12:40:00',
+            },
+            Attachment => {
+                Content     => 'VGhpcyBpcyBhIHRlc3QgdGV4dC4=',
+                ContentType => 'text/plain; charset=UTF8',
+                Filename    => 'Test.txt',
+                Disposition => 'attachment',
+            },
+        },
+        Operation => 'TicketCreate',
+    },
+# ---
 );
 
 # debugger object
@@ -4066,7 +4264,6 @@ for my $Test (@Tests) {
             $LocalTicketData{Title},
             $Test->{RequestData}->{Ticket}->{Title},
             "$Test->{Name} - local Ticket->Title match test definition.",
-
         );
 
         # external customers only set it's value in article (if no From is defined), ticket
@@ -4119,11 +4316,35 @@ for my $Test (@Tests) {
 
         for my $Attribute (qw(Subject Body ContentType MimeType Charset From)) {
             if ( $Test->{RequestData}->{Article}->{$Attribute} ) {
+
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
+#                 $Self->Is(
+#                     $LocalArticleData{$Attribute},
+#                     $Test->{RequestData}->{Article}->{$Attribute},
+#                     "$Test->{Name} - local Article->$Attribute match test definition.",
+#                 );
+
+                my $ExpectedValue = $Test->{RequestData}->{Article}->{$Attribute};
+                if (
+                    $Attribute eq 'Subject'
+                    && $Test->{RequestData}->{Article}->{ArticleSend}
+                ) {
+                    $ExpectedValue = $TicketObject->TicketSubjectBuild(
+                        TicketNumber => $LocalTicketData{TicketNumber},
+                        Subject      => $Test->{RequestData}->{Article}->{$Attribute},
+                        Type         => 'New',
+                        Action       => 'Reply',
+                    );
+                }
+
                 $Self->Is(
                     $LocalArticleData{$Attribute},
-                    $Test->{RequestData}->{Article}->{$Attribute},
+                    $ExpectedValue,
                     "$Test->{Name} - local Article->$Attribute match test definition.",
                 );
+# ---
             }
         }
 
@@ -4222,11 +4443,29 @@ for my $Test (@Tests) {
         );
 
         # remove attributes that might be different from local and requester responses
-        for my $Attribute (
-            qw( Age AgeTimeUnix ArticleID TicketID Created Changed IncomingTime TicketNumber
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
+        my @AttributesToRemove = qw (
+            Age AgeTimeUnix ArticleID TicketID Created Changed IncomingTime TicketNumber
             CreateTimeUnix
-            )
-            )
+        );
+        if ( $Test->{RequestData}->{Article}->{ArticleSend} ) {
+            push @AttributesToRemove, qw(
+                Subject MessageID
+            );
+        }
+# ---
+        for my $Attribute (
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
+#             qw( Age AgeTimeUnix ArticleID TicketID Created Changed IncomingTime TicketNumber
+#             CreateTimeUnix
+#             )
+            @AttributesToRemove
+# ---
+        )
         {
             delete $LocalArticleData{$Attribute};
             delete $RequesterArticleData{$Attribute};
@@ -4281,6 +4520,17 @@ for my $Test (@Tests) {
             $Test->{ExpectedData}->{Data}->{Error}->{ErrorCode},
             "$Test->{Name} - Local result ErrorCode matched with expected local call result.",
         );
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
+        if ( defined $Test->{ExpectedData}->{Data}->{Error}->{ErrorMessage} ) {
+            $Self->Is(
+                $LocalResult->{Data}->{Error}->{ErrorMessage},
+                $Test->{ExpectedData}->{Data}->{Error}->{ErrorMessage},
+                "$Test->{Name} - Local result ErrorMessage matched with expected local call result.",
+            );
+        }
+# ---
         $Self->True(
             $LocalResult->{Data}->{Error}->{ErrorMessage},
             "$Test->{Name} - Local result ErrorMessage with true.",
@@ -4313,8 +4563,8 @@ for my $Test (@Tests) {
         );
 
         $Self->IsDeeply(
-            $LocalResult,
             $RequesterResult,
+            $LocalResult,
             "$Test->{Name} - Local result matched with remote result.",
         );
     }
