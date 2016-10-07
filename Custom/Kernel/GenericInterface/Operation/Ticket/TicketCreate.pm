@@ -793,7 +793,6 @@ sub _CheckArticle {
                 "TicketCreate: Article->To parameter must be a valid email address when Article->ArticleSend is set!",
         };
     }
-
 # ---
     # check Article->ContentType vs Article->MimeType and Article->Charset
     if ( !$Article->{ContentType} && !$Article->{MimeType} && !$Article->{Charset} ) {
@@ -1481,8 +1480,8 @@ sub _TicketCreate {
             for my $Attachment ( @{$AttachmentList} ) {
 
                 push @NewAttachments, {
-                    %{ $Param{Attachment} },
-                    Content => MIME::Base64::decode_base64( $Param{Attachment}->{Content} ),
+                    %{$Attachment},
+                    Content => MIME::Base64::decode_base64( $Attachment->{Content} ),
                 };
             }
 

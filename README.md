@@ -2,7 +2,7 @@
 
 GI Article Send
 =================
-This package contains the functionality to send GenericInterface articles..
+This package contains the functionality to send GenericInterface articles.
 
 **Prerequisites**
 

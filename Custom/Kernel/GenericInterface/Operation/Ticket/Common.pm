@@ -905,14 +905,14 @@ sub ValidateFrom {
 # ---
 =item ValidateToIsEmail()
 
-checks if the given from is valid.
+checks if the given to is valid.
 
-    my $Success = $CommonObject->ValidateToIsEmail(
+    my $Valid = $CommonObject->ValidateToIsEmail(
         To => 'user@domain.com',
     );
 
     returns
-    $Success = 1            # or 0
+    $Valid = 1            # or 0
 
 =cut
 
@@ -925,20 +925,16 @@ sub ValidateToIsEmail {
     my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
 
     # check email address
-    my $FoundInvalid;
     EMAIL:
     for my $Email ( Mail::Address->parse( $Param{To} ) ) {
-
         next EMAIL if $CheckItemObject->CheckEmail(
             Address => $Email->address()
         );
 
-        $FoundInvalid = 1;
-
-        last EMAIL;
+        return;
     }
 
-    return !$FoundInvalid;
+    return 1;
 }
 # ---
 
