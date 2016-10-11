@@ -1,8 +1,13 @@
-# TITEL
+# Versand von Artikeln über Generic-Interface
 
-Im OTRS Standard (ist es nicht möglich/ist es eingeschränkt möglich).... Diese Erweiterung enthält die Funktionalität um ...
+Im OTRS ist es nicht möglich, über die mitgelieferten Generic-Interface-Operationen TicketCreate und TicketUpdate Artikel zu versenden.
+Das Paket Znuny4OTRS-GIArticleSend ermöglicht dies.
 
-...
-   * ListItem
+## Neue Parameter "ArticleSend" und "To"
 
-![TITLE](doc/images/image_name.png)
+Um einen Artikel zu versenden, müssen für die Operation TicketCreate oder TicketUpdate folgende Parameter in den Artikeldaten mitgegeben werden:
+
+```
+ArticleSend => 1,
+To          => 'email@example.com', # E-Mail-Adresse, an die der Artikel versendet werden soll.
+```

@@ -1,14 +1,22 @@
 ![Znuny logo](http://znuny.com/assets/images/logo_small.png)
 
-GI Article Send
-=================
-This package contains the functionality to send GenericInterface articles.
+Znuny4OTRS-GIArticleSend
+========================
+This package enables the standard Generic Interface ticket operations to send articles.
+
+Many thanks to [PC-College](https://www.pc-college.de/) who made this package possible.
+
+**Usage**
+To send an article via operation TicketCreate or TicketUpdate, you have to set the following new parameters within the article data:
+
+```
+ArticleSend => 1,
+To          => 'email@example.com', # Email address to send article to.
+```
 
 **Prerequisites**
 
 - OTRS 5.0.x
-
-- Znuny4OTRS-Repo
 
 **Installation**
 
