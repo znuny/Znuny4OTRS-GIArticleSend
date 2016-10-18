@@ -925,8 +925,12 @@ sub ValidateToIsEmail {
     my $CheckItemObject = $Kernel::OM->Get('Kernel::System::CheckItem');
 
     # check email address
+    my @EmailAddresses = Mail::Address->parse( $Param{To} );
+    return if !@EmailAddresses;
+
     EMAIL:
-    for my $Email ( Mail::Address->parse( $Param{To} ) ) {
+    for my $Email ( @EmailAddresses ) {
+
         next EMAIL if $CheckItemObject->CheckEmail(
             Address => $Email->address()
         );
