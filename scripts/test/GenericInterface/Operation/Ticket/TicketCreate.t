@@ -108,15 +108,15 @@ $ConfigObject->Set(
 # ---
 # Znuny4OTRS-GIArticleSend
 # ---
-# disable mail dispatch
+# switch to test email dispatch
 $Helper->ConfigSettingChange(
     Valid => 1,
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::DoNotSendEmail',
+    Value => 'Kernel::System::Email::Test',
 );
 $ConfigObject->Set(
     Key   => 'SendmailModule',
-    Value => 'Kernel::System::Email::DoNotSendEmail',
+    Value => 'Kernel::System::Email::Test',
 );
 # ---
 
@@ -4121,7 +4121,19 @@ $Self->Is(
     'DebuggerObject instantiate correctly',
 );
 
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
+my $EmailTestObject = $Kernel::OM->Get('Kernel::System::Email::Test');
+# ---
+
 for my $Test (@Tests) {
+
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
+    $EmailTestObject->CleanUp();
+# ---
 
     # create local object
     my $LocalObject = "Kernel::GenericInterface::Operation::Ticket::$Test->{Operation}"->new(
@@ -4476,6 +4488,35 @@ for my $Test (@Tests) {
             \%RequesterArticleData,
             "$Test->{Name} - Local article result matched with remote result.",
         );
+
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
+        # Check if email has been sent
+        if ( $Test->{RequestData}->{Article}->{ArticleSend} ) {
+
+            my $Emails = $EmailTestObject->EmailsGet();
+            $Self->True(
+                scalar IsArrayRefWithData($Emails),
+                "$Test->{Name} - Email(s) must have been sent.",
+            );
+
+            my $RecipientFound = 0;
+            EMAIL:
+            for my $Email ( @{$Emails} ) {
+                next EMAIL if !IsArrayRefWithData( $Email->{ToArray} );
+                next EMAIL if !grep { $_ eq $Test->{RequestData}->{Article}->{To} } @{ $Email->{ToArray} };
+
+                $RecipientFound = 1;
+                last EMAIL;
+            }
+
+            $Self->True(
+                $RecipientFound,
+                "$Test->{Name} - Email must have been sent to $Test->{RequestData}->{Article}->{To}.",
+            );
+        }
+# ---
 
         # delete the tickets
         for my $TicketID (
