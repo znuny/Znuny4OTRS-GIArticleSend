@@ -2,7 +2,7 @@
 # Copyright (C) 2001-2016 OTRS AG, http://otrs.com/
 # Copyright (C) 2012-2016 Znuny GmbH, http://znuny.com/
 # --
-# $origin: https://github.com/OTRS/otrs/blob/e8609962264abb16a02696f31e110d9f1c31c612/Kernel/GenericInterface/Operation/Ticket/TicketCreate.pm
+# $origin: https://github.com/OTRS/otrs/blob/4833021ff5bf36631519bf8c8c332f27f480fa10/Kernel/GenericInterface/Operation/Ticket/TicketCreate.pm
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -125,16 +125,16 @@ perform TicketCreate Operation. This will return the created ticket number.
                 #},
             },
             Article => {
-# ---
-# Znuny4OTRS-GIArticleSend
-# ---
-                ArticleSend                     => 1,                          # optional
-# ---
                 ArticleTypeID                   => 123,                        # optional
                 ArticleType                     => 'some article type name',   # optional
                 SenderTypeID                    => 123,                        # optional
                 SenderType                      => 'some sender type name',    # optional
                 AutoResponseType                => 'some auto response type',  # optional
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
+                ArticleSend                     => 1,                          # optional
+# ---
                 From                            => 'some from string',         # optional
 # ---
 # Znuny4OTRS-GIArticleSend
@@ -786,7 +786,8 @@ sub _CheckArticle {
     if (
         $Article->{ArticleSend}
         && !$Self->ValidateToIsEmail( %{$Article} )
-    ) {
+        )
+    {
         return {
             ErrorCode => 'TicketCreate.InvalidParameter',
             ErrorMessage =>
@@ -794,6 +795,7 @@ sub _CheckArticle {
         };
     }
 # ---
+
     # check Article->ContentType vs Article->MimeType and Article->Charset
     if ( !$Article->{ContentType} && !$Article->{MimeType} && !$Article->{Charset} ) {
         return {
@@ -1332,11 +1334,13 @@ sub _TicketCreate {
 #     else {
 #         $From = $Ticket->{CustomerUser};
 #     }
+
     # When we are sending the article as an email, set the from address to the ticket's system address
     if (
         $Article->{ArticleSend}
         && !$Article->{From}
-    ) {
+        )
+    {
         my $QueueObject = $Kernel::OM->Get('Kernel::System::Queue');
 
         my $QueueID = $TicketObject->TicketQueueID(
@@ -1406,6 +1410,7 @@ sub _TicketCreate {
 #
 #         },
 #     );
+
     if ( $Article->{ArticleSend} ) {
         $To = $Article->{To};
     }
@@ -1436,7 +1441,7 @@ sub _TicketCreate {
 
         if ( !$Subject ) {
             return {
-                Success      => 0,
+                Success => 0,
                 ErrorMessage =>
                     'The subject for the e-mail could not be generated. Please contact the system administrator'
             };
@@ -1444,22 +1449,22 @@ sub _TicketCreate {
     }
 
     my %ArticleParams = (
-        NoAgentNotify    => $Article->{NoAgentNotify}  || 0,
-        TicketID         => $TicketID,
-        ArticleTypeID    => $Article->{ArticleTypeID}  || '',
-        ArticleType      => $Article->{ArticleType}    || '',
-        SenderTypeID     => $Article->{SenderTypeID}   || '',
-        SenderType       => $Article->{SenderType}     || '',
-        From             => $From,
-        To               => $To,
-        Subject          => $Subject,
-        Body             => $Article->{Body},
-        MimeType         => $Article->{MimeType}       || '',
-        Charset          => $Article->{Charset}        || '',
-        ContentType      => $Article->{ContentType}    || '',
-        UserID           => $Param{UserID},
-        HistoryType      => $Article->{HistoryType},
-        HistoryComment   => $Article->{HistoryComment} || '%%',
+        NoAgentNotify  => $Article->{NoAgentNotify}  || 0,
+        TicketID       => $TicketID,
+        ArticleTypeID  => $Article->{ArticleTypeID}  || '',
+        ArticleType    => $Article->{ArticleType}    || '',
+        SenderTypeID   => $Article->{SenderTypeID}   || '',
+        SenderType     => $Article->{SenderType}     || '',
+        From           => $From,
+        To             => $To,
+        Subject        => $Subject,
+        Body           => $Article->{Body},
+        MimeType       => $Article->{MimeType}       || '',
+        Charset        => $Article->{Charset}        || '',
+        ContentType    => $Article->{ContentType}    || '',
+        UserID         => $Param{UserID},
+        HistoryType    => $Article->{HistoryType},
+        HistoryComment => $Article->{HistoryComment} || '%%',
         AutoResponseType => $Article->{AutoResponseType},
         OrigHeader       => {
             From    => $From,
@@ -1635,7 +1640,7 @@ sub _TicketCreate {
     my %TicketData = $TicketObject->TicketGet(
         TicketID      => $TicketID,
         DynamicFields => 0,
-        UserID        => $Param{UserId},
+        UserID        => $Param{UserID},
     );
 
     if ( !IsHashRefWithData( \%TicketData ) ) {

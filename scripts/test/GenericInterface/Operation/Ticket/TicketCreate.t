@@ -4088,7 +4088,7 @@ my @Tests        = (
                 ExcludeNotificationToUserID     => [1],
                 ExcludeMuteNotificationToUserID => [1],
                 ArticleSend                     => 1,
-                To                              => 'mail@example.com',
+                To                              => 'root@localhost',
             },
             DynamicField => {
                 Name  => $DynamicFieldDateTimeConfig{Name},
