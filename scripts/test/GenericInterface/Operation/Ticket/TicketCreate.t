@@ -8,6 +8,7 @@
 # the enclosed file COPYING for license information (AGPL). If you
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
+
 # ---
 # Znuny4OTRS-GIArticleSend
 # ---
@@ -3949,7 +3950,7 @@ my @Tests        = (
             },
             Article => {
                 Subject                         => 'Article subject äöüßÄÖÜ€ис',
-                Body                            => 'Article body !"Â§$%&/()=?Ã*ÃÃL:L@,.-',
+                Body                            => 'Article body !"Â§$%&/()=?Ã<U+009C>*Ã<U+0084>Ã<U+0096>L:L@,.-',
                 AutoResponseType                => 'auto reply',
                 ArticleType                     => 'email-external',
                 SenderType                      => 'agent',
@@ -4011,7 +4012,7 @@ my @Tests        = (
             },
             Article => {
                 Subject                         => 'Article subject äöüßÄÖÜ€ис',
-                Body                            => 'Article body !"Â§$%&/()=?Ã*ÃÃL:L@,.-',
+                Body                            => 'Article body !"Â§$%&/()=?Ã<U+009C>*Ã<U+0084>Ã<U+0096>L:L@,.-',
                 AutoResponseType                => 'auto reply',
                 ArticleType                     => 'email-external',
                 SenderType                      => 'agent',
@@ -4074,7 +4075,7 @@ my @Tests        = (
             },
             Article => {
                 Subject                         => 'Article subject äöüßÄÖÜ€ис',
-                Body                            => 'Article body !"Â§$%&/()=?Ã*ÃÃL:L@,.-',
+                Body                            => 'Article body !"Â§$%&/()=?Ã<U+009C>*Ã<U+0084>Ã<U+0096>L:L@,.-',
                 AutoResponseType                => 'auto reply',
                 ArticleType                     => 'email-external',
                 SenderType                      => 'agent',
@@ -4276,6 +4277,7 @@ for my $Test (@Tests) {
             $LocalTicketData{Title},
             $Test->{RequestData}->{Ticket}->{Title},
             "$Test->{Name} - local Ticket->Title match test definition.",
+
         );
 
         # external customers only set it's value in article (if no From is defined), ticket
@@ -4328,7 +4330,6 @@ for my $Test (@Tests) {
 
         for my $Attribute (qw(Subject Body ContentType MimeType Charset From)) {
             if ( $Test->{RequestData}->{Article}->{$Attribute} ) {
-
 # ---
 # Znuny4OTRS-GIArticleSend
 # ---
@@ -4604,8 +4605,8 @@ for my $Test (@Tests) {
         );
 
         $Self->IsDeeply(
-            $RequesterResult,
             $LocalResult,
+            $RequesterResult,
             "$Test->{Name} - Local result matched with remote result.",
         );
     }
