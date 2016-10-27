@@ -1448,6 +1448,28 @@ sub _TicketCreate {
         }
     }
 
+	# Build Charset if needed (ArticleSend doesnt accept ContentType)
+    my $Charset;
+    if ( $Article->{ContentType} && !$Article->{Charset} ) {
+        $Charset = $Article->{ContentType};
+        $Charset =~ s/.+?charset=("|'|)(\w+)/$2/gi;
+        $Charset =~ s/"|'//g;
+        $Charset =~ s/(.+?);.*/$1/g;
+    }
+    else {
+        $Charset = $Article->{Charset};
+    }
+
+    # Build MimeType if needed (ArticleSend doesnt accept ContentType)
+    my $MimeType;
+    if ( $Article->{ContentType} && !$Article->{MimeType} ) {
+        $Article->{ContentType} =~ /^(\w+\/\w+)/i;
+        $MimeType = $1;
+        $MimeType =~ s/"|'//g;
+    }
+    else {
+        $MimeType = $Article->{MimeType};
+    }
     my %ArticleParams = (
         NoAgentNotify  => $Article->{NoAgentNotify}  || 0,
         TicketID       => $TicketID,
@@ -1459,8 +1481,8 @@ sub _TicketCreate {
         To             => $To,
         Subject        => $Subject,
         Body           => $Article->{Body},
-        MimeType       => $Article->{MimeType}       || '',
-        Charset        => $Article->{Charset}        || '',
+        MimeType       => $MimeType       			 || '',
+        Charset        => $Charset        			 || '',
         ContentType    => $Article->{ContentType}    || '',
         UserID         => $Param{UserID},
         HistoryType    => $Article->{HistoryType},
