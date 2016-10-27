@@ -4,7 +4,8 @@ Znuny4OTRS-GIArticleSend
 ========================
 This package enables the standard Generic Interface ticket operations to send articles.
 
-Many thanks to [PC-College](https://www.pc-college.de/) who made this package possible.
+This feature is based on OTRS [pull request #815](https://github.com/OTRS/otrs/pull/815) by github user [fredericve](https://github.com/fredericve).
+Also many thanks to [PC-College](https://www.pc-college.de/) who made this package possible.
 
 **Usage**
 To send an article via operation TicketCreate or TicketUpdate, you have to set the following new parameters within the article data:
