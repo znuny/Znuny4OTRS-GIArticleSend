@@ -2,7 +2,7 @@
 # Copyright (C) 2001-2016 OTRS AG, http://otrs.com/
 # Copyright (C) 2012-2016 Znuny GmbH, http://znuny.com/
 # --
-# $origin: https://github.com/OTRS/otrs/blob/bcc98d03ca7dcaa19af173b1e9d8bc04d27d6d3d/Kernel/GenericInterface/Operation/Ticket/TicketUpdate.pm
+# $origin: https://github.com/OTRS/otrs/blob/e31bfa4df1af53c62df0f0f8a112eb84ba856136/Kernel/GenericInterface/Operation/Ticket/TicketUpdate.pm
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -118,18 +118,17 @@ if applicable the created ArticleID.
                 #     Diff => 10080, # Pending time in minutes
                 #},
             },
-            Article {                                                          # optional
-# ---
-# Znuny4OTRS-GIArticleSend
-# ---
-                ArticleSend                     => 1,                          # optional
-# ---
-
+            Article => {                                                          # optional
                 ArticleTypeID                   => 123,                        # optional
                 ArticleType                     => 'some article type name',   # optional
                 SenderTypeID                    => 123,                        # optional
                 SenderType                      => 'some sender type name',    # optional
                 AutoResponseType                => 'some auto response type',  # optional
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
+                ArticleSend                     => 1,                          # optional
+# ---
                 From                            => 'some from string',         # optional
 # ---
 # Znuny4OTRS-GIArticleSend
@@ -137,7 +136,7 @@ if applicable the created ArticleID.
                 To                              => 'some to address',          # optional, required if ArticleSend => 1
 # ---
                 Subject                         => 'some subject',
-                Body                            => 'some body'
+                Body                            => 'some body',
 
                 ContentType                     => 'some content type',        # ContentType or MimeType and Charset is required
                 MimeType                        => 'some mime type',
@@ -848,15 +847,16 @@ sub _CheckArticle {
     if (
         $Article->{ArticleSend}
         && !$Self->ValidateToIsEmail( %{$Article} )
-    ) {
+        )
+    {
         return {
             ErrorCode => 'TicketCreate.InvalidParameter',
             ErrorMessage =>
                 "TicketCreate: Article->To parameter must be a valid email address when Article->ArticleSend is set!",
         };
     }
-
 # ---
+
     # check Article->ContentType vs Article->MimeType and Article->Charset
     if ( !$Article->{ContentType} && !$Article->{MimeType} && !$Article->{Charset} ) {
         return {
@@ -1856,6 +1856,8 @@ sub _TicketUpdate {
         }
     }
 
+    my $UnlockOnAway = 1;
+
     # update Ticket->Owner
     if ( $Ticket->{Owner} || $Ticket->{OwnerID} ) {
         my $Success;
@@ -1865,6 +1867,7 @@ sub _TicketUpdate {
                 TicketID => $TicketID,
                 UserID   => $Param{UserID},
             );
+            $UnlockOnAway = 0;
         }
         elsif ( defined $Ticket->{OwnerID} && $Ticket->{OwnerID} ne $TicketData{OwnerID} )
         {
@@ -1873,6 +1876,7 @@ sub _TicketUpdate {
                 TicketID  => $TicketID,
                 UserID    => $Param{UserID},
             );
+            $UnlockOnAway = 0;
         }
         else {
 
@@ -1934,15 +1938,18 @@ sub _TicketUpdate {
 
         # set Article From
         my $From;
+
 # ---
 # Znuny4OTRS-GIArticleSend
 # ---
 #         if ( $Article->{From} ) {
+
         # When we are sending the article as an email, set the from address to the ticket's system address
         if (
             $Article->{ArticleSend}
             && !$Article->{From}
-        ) {
+            )
+        {
             my $QueueID = $TicketObject->TicketQueueID(
                 TicketID => $TicketID,
             );
@@ -1979,6 +1986,7 @@ sub _TicketUpdate {
 
         # set Article To
         my $To = '';
+
 # ---
 # Znuny4OTRS-GIArticleSend
 # ---
@@ -2009,6 +2017,7 @@ sub _TicketUpdate {
 #
 #             },
 #         );
+
         # If we are sending the article as an email, set the to address to the provided address.
         if ( $Article->{ArticleSend} ) {
             $To = $Article->{To};
@@ -2032,7 +2041,7 @@ sub _TicketUpdate {
 
             if ( !$Subject ) {
                 return {
-                    Success      => 0,
+                    Success => 0,
                     ErrorMessage =>
                         'The subject for the e-mail could not be generated. Please contact the system administrator'
                 };
@@ -2040,22 +2049,22 @@ sub _TicketUpdate {
         }
 
         my %ArticleParams = (
-            NoAgentNotify    => $Article->{NoAgentNotify}  || 0,
-            TicketID         => $TicketID,
-            ArticleTypeID    => $Article->{ArticleTypeID}  || '',
-            ArticleType      => $Article->{ArticleType}    || '',
-            SenderTypeID     => $Article->{SenderTypeID}   || '',
-            SenderType       => $Article->{SenderType}     || '',
-            From             => $From,
-            To               => $To,
-            Subject          => $Subject,
-            Body             => $Article->{Body},
-            MimeType         => $Article->{MimeType}       || '',
-            Charset          => $Article->{Charset}        || '',
-            ContentType      => $Article->{ContentType}    || '',
-            UserID           => $Param{UserID},
-            HistoryType      => $Article->{HistoryType},
-            HistoryComment   => $Article->{HistoryComment} || '%%',
+            NoAgentNotify  => $Article->{NoAgentNotify}  || 0,
+            TicketID       => $TicketID,
+            ArticleTypeID  => $Article->{ArticleTypeID}  || '',
+            ArticleType    => $Article->{ArticleType}    || '',
+            SenderTypeID   => $Article->{SenderTypeID}   || '',
+            SenderType     => $Article->{SenderType}     || '',
+            From           => $From,
+            To             => $To,
+            Subject        => $Subject,
+            Body           => $Article->{Body},
+            MimeType       => $Article->{MimeType}       || '',
+            Charset        => $Article->{Charset}        || '',
+            ContentType    => $Article->{ContentType}    || '',
+            UserID         => $Param{UserID},
+            HistoryType    => $Article->{HistoryType},
+            HistoryComment => $Article->{HistoryComment} || '%%',
             AutoResponseType => $Article->{AutoResponseType},
             OrigHeader       => {
                 From    => $From,
@@ -2076,7 +2085,7 @@ sub _TicketUpdate {
                 for my $Attachment ( @{$AttachmentList} ) {
 
                     push @NewAttachments, {
-                        %{ $Attachment },
+                        %{$Attachment},
                         Content => MIME::Base64::decode_base64( $Attachment->{Content} ),
                     };
                 }
