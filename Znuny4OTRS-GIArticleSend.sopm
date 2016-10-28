@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <otrs_package version="1.0">
     <Name>Znuny4OTRS-GIArticleSend</Name>
-    <Version>5.0.2</Version>
+    <Version>5.0.3</Version>
+    <ChangeLog Version="5.0.3" Date="2016-10-28 17:23:44 +0200">Added content type handling for ArticleSend feature, pull request #1, many thanks to @BlangTech.</ChangeLog>
     <ChangeLog Version="5.0.2" Date="2016-10-27 10:58:23 +0200">Updated to latest OTRS 5 framework version.</ChangeLog>
     <ChangeLog Version="5.0.1" Date="2016-10-12 12:05:40 +0200">Initial release 5.0.x.</ChangeLog>
     <Framework>5.0.x</Framework>
