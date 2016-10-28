@@ -2048,24 +2048,27 @@ sub _TicketUpdate {
             }
         }
 
-        # Build Charset if needed (ArticleSend doesnt accept ContentType)
+        # Build Charset if needed (ArticleSend doesn't accept ContentType)
         my $Charset;
-        if ( $Article->{ContentType} && !$Article->{Charset} ) {
-            $Charset = $Article->{ContentType};
-            $Charset =~ s/.+?charset=("|'|)(\w+)/$2/gi;
-            $Charset =~ s/"|'//g;
-            $Charset =~ s/(.+?);.*/$1/g;
+        if (
+            $Article->{ContentType}
+            && !$Article->{Charset}
+            && $Article->{ContentType} =~ m{\bcharset=("|'|)([^\s"';]+)}ism
+        ) {
+            $Charset = $2;
         }
         else {
             $Charset = $Article->{Charset};
         }
 
-        # Build MimeType if needed (ArticleSend doesnt accept ContentType)
+        # Build MimeType if needed (ArticleSend doesn't accept ContentType)
         my $MimeType;
-        if ( $Article->{ContentType} && !$Article->{MimeType} ) {
-            $Article->{ContentType} =~ /^(\w+\/\w+)/i;
+        if (
+            $Article->{ContentType}
+            && !$Article->{MimeType}
+            && $Article->{ContentType} =~ m{\A([^;]+)}sm
+        ) {
             $MimeType = $1;
-            $MimeType =~ s/"|'//g;
         }
         else {
             $MimeType = $Article->{MimeType};
