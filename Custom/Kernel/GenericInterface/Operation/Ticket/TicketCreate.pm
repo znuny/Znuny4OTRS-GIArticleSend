@@ -155,6 +155,25 @@ perform TicketCreate Operation. This will return the created ticket number.
                 ForceNotificationToUserID       => [1, 2, 3]                   # optional
                 ExcludeNotificationToUserID     => [1, 2, 3]                   # optional
                 ExcludeMuteNotificationToUserID => [1, 2, 3]                   # optional
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
+                # Signing and encryption, only used when ArticleSend is set to 1
+                Sign => {
+                    Type    => 'PGP',
+                    SubType => 'Inline|Detached',
+                    Key     => '81877F5E',
+                    Type    => 'SMIME',
+                    Key     => '3b630c80',
+                },
+                Crypt => {
+                    Type    => 'PGP',
+                    SubType => 'Inline|Detached',
+                    Key     => '81877F5E',
+                    Type    => 'SMIME',
+                    Key     => '3b630c80',
+                },
+# ---
             },
 
             DynamicField => [                                                  # optional
@@ -1518,6 +1537,17 @@ sub _TicketCreate {
 
             $ArticleParams{Attachment} = \@NewAttachments;
         }
+
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
+        # signing and encryption
+        for my $Key ( qw( Sign Crypt ) ) {
+            if ( IsHashRefWithData( $Article->{$Key} ) ) {
+                $ArticleParams{$Key} = $Article->{$Key};
+            }
+        }
+# ---
 
         $ArticleID = $TicketObject->ArticleSend(%ArticleParams);
     }
