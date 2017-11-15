@@ -19,5 +19,6 @@
         <File Permission="644" Location="Custom/Kernel/GenericInterface/Operation/Ticket/TicketUpdate.pm"/>
         <File Permission="644" Location="scripts/test/Znuny4OTRSGIArticleSend/GenericInterface/Operation/Ticket/TicketCreate.t"/>
         <File Permission="644" Location="scripts/test/Znuny4OTRSGIArticleSend/GenericInterface/Operation/Ticket/TicketUpdate.t"/>
+        <File Permission="644" Location="scripts/webservices/Znuny4OTRSGIArticleSend/GIArticleSend.yml"/>
     </Filelist>
 </otrs_package>
