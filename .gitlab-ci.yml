@@ -17,6 +17,7 @@ job_unit_otrs_Znuny4OTRSGIArticleSend:
     - env
     - pwd
     - /run.sh
+    - su -c "perl /opt/otrs/bin/otrs.Console.pl Znuny4OTRS::AdvancedPackageManager::InstallSOPM /opt/otrs/Znuny4OTRS-GIArticleSend.sopm" -s /bin/bash otrs
     - su -c "perl /opt/otrs/bin/otrs.Console.pl Dev::UnitTest::Run --verbose --test Znuny4OTRSGIArticleSend/GenericInterface/Operation/Ticket/TicketCreate" -s /bin/bash otrs
     - su -c "perl /opt/otrs/bin/otrs.Console.pl Dev::UnitTest::Run --verbose --test Znuny4OTRSGIArticleSend/GenericInterface/Operation/Ticket/TicketUpdate" -s /bin/bash otrs
 
