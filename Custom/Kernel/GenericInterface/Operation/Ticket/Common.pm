@@ -2,7 +2,7 @@
 # Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # Copyright (C) 2012-2017 Znuny GmbH, http://znuny.com/
 # --
-# $origin: otrs - 168d91e61e92ebb2b665a447e7955c860d607256 - Kernel/GenericInterface/Operation/Ticket/Common.pm
+# $origin: otrs - 2be0a4540ffd992654d13728e82a63d9040e1a3a - Kernel/GenericInterface/Operation/Ticket/Common.pm
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
