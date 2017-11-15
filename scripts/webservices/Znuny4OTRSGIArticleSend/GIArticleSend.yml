@@ -12,12 +12,14 @@ Provider:
       MappingInbound: {}
       MappingOutbound: {}
       Type: Ticket::TicketCreate
+      IncludeTicketData: 1
     TicketUpdate:
       Description: ''
       IncludeTicketData: ''
       MappingInbound: {}
       MappingOutbound: {}
       Type: Ticket::TicketUpdate
+      IncludeTicketData: 1
   Transport:
     Type: HTTP::REST
 RemoteSystem: ''

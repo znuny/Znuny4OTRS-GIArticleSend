@@ -6,7 +6,7 @@
     <ChangeLog Version="5.0.3" Date="2016-10-28 17:23:44 +0200">Added content type handling for ArticleSend feature, pull request #1, many thanks to @BlangTech.</ChangeLog>
     <ChangeLog Version="5.0.2" Date="2016-10-27 10:58:23 +0200">Updated to latest OTRS 5 framework version.</ChangeLog>
     <ChangeLog Version="5.0.1" Date="2016-10-12 12:05:40 +0200">Initial release 5.0.x.</ChangeLog>
-    <Framework>5.0.x</Framework>
+    <Framework>6.0.x</Framework>
     <PackageRequired Version="5.0.15">Znuny4OTRS-Repo</PackageRequired>
     <Vendor>Znuny GmbH</Vendor>
     <URL>http://znuny.com/</URL>
@@ -14,11 +14,11 @@
     <Description Lang="en">This package enables the standard Generic Interface ticket operations to send articles.</Description>
     <Description Lang="de">Dieses Paket ermöglicht den Versand von Artikeln über Standard-Generic-Interface-Ticket-Operationen.</Description>
     <Filelist>
-        <File Permission="644" Location="Custom/Kernel/GenericInterface/Operation/Ticket/Common.pm"/>
-        <File Permission="644" Location="Custom/Kernel/GenericInterface/Operation/Ticket/TicketCreate.pm"/>
-        <File Permission="644" Location="Custom/Kernel/GenericInterface/Operation/Ticket/TicketUpdate.pm"/>
-        <File Permission="644" Location="scripts/test/Znuny4OTRSGIArticleSend/GenericInterface/Operation/Ticket/TicketCreate.t"/>
-        <File Permission="644" Location="scripts/test/Znuny4OTRSGIArticleSend/GenericInterface/Operation/Ticket/TicketUpdate.t"/>
-        <File Permission="644" Location="scripts/webservices/Znuny4OTRSGIArticleSend/GIArticleSend.yml"/>
+        <File Permission="660" Location="Custom/Kernel/GenericInterface/Operation/Ticket/Common.pm"/>
+        <File Permission="660" Location="Custom/Kernel/GenericInterface/Operation/Ticket/TicketCreate.pm"/>
+        <File Permission="660" Location="Custom/Kernel/GenericInterface/Operation/Ticket/TicketUpdate.pm"/>
+        <File Permission="660" Location="scripts/test/Znuny4OTRSGIArticleSend/GenericInterface/Operation/Ticket/TicketCreate.t"/>
+        <File Permission="660" Location="scripts/test/Znuny4OTRSGIArticleSend/GenericInterface/Operation/Ticket/TicketUpdate.t"/>
+        <File Permission="660" Location="scripts/webservices/Znuny4OTRSGIArticleSend/GIArticleSend.yml"/>
     </Filelist>
 </otrs_package>
