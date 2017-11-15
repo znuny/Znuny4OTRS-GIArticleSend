@@ -17,7 +17,9 @@ To          => 'email@example.com', # Email address to send article to.
 
 **Prerequisites**
 
-- OTRS 5.0.x
+- Znuny4OTRS-Repo
+
+- OTRS 5
 
 **Installation**
 
