@@ -1,7 +1,8 @@
 image: registry.znuny.com/znuny/docker-otrs6ci:latest
 
 services:
-  - mysql:latest
+  - name: registry.znuny.com/znuny/docker-mysql-utf8:latest
+    alias: mysql
 
 variables:
   MYSQL_DATABASE: otrs
