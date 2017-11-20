@@ -19,7 +19,7 @@ To          => 'email@example.com', # Email address to send article to.
 
 - Znuny4OTRS-Repo
 
-- OTRS 5
+- OTRS 6
 
 **Installation**
 
