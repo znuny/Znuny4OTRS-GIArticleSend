@@ -1675,16 +1675,12 @@ sub _TicketCreate {
             $ArticleParams{Attachment} = \@NewAttachments;
         }
 
-# ---
-# Znuny4OTRS-GIArticleSend
-# ---
         # signing and encryption
         for my $Key ( qw( Sign Crypt ) ) {
             if ( IsHashRefWithData( $Article->{$Key} ) ) {
                 $ArticleParams{$Key} = $Article->{$Key};
             }
         }
-# ---
 
         $ArticleID = $ArticleBackendObject->ArticleSend(%ArticleParams);
     }
