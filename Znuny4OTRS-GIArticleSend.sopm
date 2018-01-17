@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <otrs_package version="1.0">
     <Name>Znuny4OTRS-GIArticleSend</Name>
-    <Version>6.0.1</Version>
+    <Version>6.0.3</Version>
+    <ChangeLog Version="6.0.3" Date="2018-01-04 14:30:54 +0100">Fix Attachment creation for OTRS 6.0.3 and above.</ChangeLog>
     <ChangeLog Version="6.0.1" Date="2017-11-15 15:11:54 +0100">Initial release 6.0.x.</ChangeLog>
     <ChangeLog Version="5.0.4" Date="2016-11-24 09:13:19 +0100">added optional paramater for signing/encryption with S/MIME and PGP</ChangeLog>
     <ChangeLog Version="5.0.3" Date="2016-10-28 17:23:44 +0200">Added content type handling for ArticleSend feature, pull request #1, many thanks to @BlangTech.</ChangeLog>
