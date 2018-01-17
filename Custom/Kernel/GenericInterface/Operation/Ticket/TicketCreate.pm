@@ -1696,6 +1696,7 @@ sub _TicketCreate {
 
             for my $Attachment ( @{$AttachmentList} ) {
                 my $Result = $Self->CreateAttachment(
+                    TicketID   => $TicketID,
                     Attachment => $Attachment,
                     ArticleID  => $ArticleID,
                     UserID     => $Param{UserID}
