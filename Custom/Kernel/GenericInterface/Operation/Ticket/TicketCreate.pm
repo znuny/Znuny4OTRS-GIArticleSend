@@ -1,6 +1,6 @@
 # --
-# Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
-# Copyright (C) 2012-2017 Znuny GmbH, http://znuny.com/
+# Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
+# Copyright (C) 2012-2018 Znuny GmbH, http://znuny.com/
 # --
 # $origin: otrs - 4833021ff5bf36631519bf8c8c332f27f480fa10 - Kernel/GenericInterface/Operation/Ticket/TicketCreate.pm
 # --
@@ -1538,16 +1538,12 @@ sub _TicketCreate {
             $ArticleParams{Attachment} = \@NewAttachments;
         }
 
-# ---
-# Znuny4OTRS-GIArticleSend
-# ---
         # signing and encryption
         for my $Key ( qw( Sign Crypt ) ) {
             if ( IsHashRefWithData( $Article->{$Key} ) ) {
                 $ArticleParams{$Key} = $Article->{$Key};
             }
         }
-# ---
 
         $ArticleID = $TicketObject->ArticleSend(%ArticleParams);
     }
