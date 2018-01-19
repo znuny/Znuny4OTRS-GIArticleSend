@@ -2,7 +2,7 @@
 # Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
 # Copyright (C) 2012-2018 Znuny GmbH, http://znuny.com/
 # --
-# $origin: otrs - e31bfa4df1af53c62df0f0f8a112eb84ba856136 - Kernel/GenericInterface/Operation/Ticket/TicketUpdate.pm
+# $origin: otrs - 6559a7a0ada76af361b47b13d2cbbea64361e6a7 - Kernel/GenericInterface/Operation/Ticket/TicketUpdate.pm
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -2006,6 +2006,16 @@ sub _TicketUpdate {
         # set Article To
         my $To = '';
 
+        my $PlainBody = $Article->{Body};
+
+        # Convert article body to plain text, if HTML content was supplied. This is necessary since auto response code
+        #   expects plain text content. Please see bug#13397 for more information.
+        if ( $Article->{ContentType} =~ /text\/html/i || $Article->{MimeType} =~ /text\/html/i ) {
+            $PlainBody = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToAscii(
+                String => $Article->{Body},
+            );
+        }
+
 # ---
 # Znuny4OTRS-GIArticleSend
 # ---
@@ -2028,12 +2038,12 @@ sub _TicketUpdate {
 #             HistoryType    => $Article->{HistoryType},
 #             HistoryComment => $Article->{HistoryComment} || '%%',
 #             AutoResponseType => $Article->{AutoResponseType},
+#             UnlockOnAway     => $UnlockOnAway,
 #             OrigHeader       => {
 #                 From    => $From,
 #                 To      => $To,
 #                 Subject => $Article->{Subject},
-#                 Body    => $Article->{Body},
-#
+#                 Body    => $PlainBody,
 #             },
 #         );
 
@@ -2115,7 +2125,7 @@ sub _TicketUpdate {
                 From    => $From,
                 To      => $To,
                 Subject => $Subject,
-                Body    => $Article->{Body},
+                Body    => $PlainBody,
             },
         );
 

@@ -2,7 +2,7 @@
 # Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
 # Copyright (C) 2012-2018 Znuny GmbH, http://znuny.com/
 # --
-# $origin: otrs - 4833021ff5bf36631519bf8c8c332f27f480fa10 - Kernel/GenericInterface/Operation/Ticket/TicketCreate.pm
+# $origin: otrs - 6559a7a0ada76af361b47b13d2cbbea64361e6a7 - Kernel/GenericInterface/Operation/Ticket/TicketCreate.pm
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -1402,6 +1402,32 @@ sub _TicketCreate {
 #         );
 #     }
 #
+    if ( $Article->{ArticleSend} ) {
+        $To = $Article->{To};
+    }
+    elsif ( $Ticket->{Queue} ) {
+        $To = $Ticket->{Queue};
+    }
+    else {
+        $To = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
+            QueueID => $Ticket->{QueueID},
+        );
+    }
+# ---
+
+    my $PlainBody = $Article->{Body};
+
+    # Convert article body to plain text, if HTML content was supplied. This is necessary since auto response code
+    #   expects plain text content. Please see bug#13397 for more information.
+    if ( $Article->{ContentType} =~ /text\/html/i || $Article->{MimeType} =~ /text\/html/i ) {
+        $PlainBody = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToAscii(
+            String => $Article->{Body},
+        );
+    }
+
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
 #     # create article
 #     my $ArticleID = $TicketObject->ArticleCreate(
 #         NoAgentNotify  => $Article->{NoAgentNotify}  || 0,
@@ -1425,23 +1451,9 @@ sub _TicketCreate {
 #             From    => $From,
 #             To      => $To,
 #             Subject => $Article->{Subject},
-#             Body    => $Article->{Body},
-#
+#             Body    => $PlainBody,
 #         },
 #     );
-
-    if ( $Article->{ArticleSend} ) {
-        $To = $Article->{To};
-    }
-    elsif ( $Ticket->{Queue} ) {
-        $To = $Ticket->{Queue};
-    }
-    else {
-        $To = $Kernel::OM->Get('Kernel::System::Queue')->QueueLookup(
-            QueueID => $Ticket->{QueueID},
-        );
-    }
-
     my $Subject = $Article->{Subject};
     if ( $Article->{ArticleSend} ) {
 
@@ -1515,7 +1527,7 @@ sub _TicketCreate {
             From    => $From,
             To      => $To,
             Subject => $Subject,
-            Body    => $Article->{Body},
+            Body    => $PlainBody,
         },
     );
 
