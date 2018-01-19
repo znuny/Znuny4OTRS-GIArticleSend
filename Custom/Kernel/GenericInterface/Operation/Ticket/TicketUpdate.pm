@@ -2,7 +2,7 @@
 # Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
 # Copyright (C) 2012-2018 Znuny GmbH, http://znuny.com/
 # --
-# $origin: otrs - 2be0a4540ffd992654d13728e82a63d9040e1a3a - Kernel/GenericInterface/Operation/Ticket/TicketUpdate.pm
+# $origin: otrs - 4fe218beccdb926a29dd7bed9de48211430d69d0 - Kernel/GenericInterface/Operation/Ticket/TicketUpdate.pm
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -2132,36 +2132,46 @@ sub _TicketUpdate {
         my $ArticleBackendObject = $Kernel::OM->Get('Kernel::System::Ticket::Article')->BackendForChannel(
             ChannelName => $Article->{CommunicationChannel},
         );
+
+        my $PlainBody = $Article->{Body};
+
+        # Convert article body to plain text, if HTML content was supplied. This is necessary since auto response code
+        #   expects plain text content. Please see bug#13397 for more information.
+        if ( $Article->{ContentType} =~ /text\/html/i || $Article->{MimeType} =~ /text\/html/i ) {
+            $PlainBody = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToAscii(
+                String => $Article->{Body},
+            );
+        }
+
 # ---
 # Znuny4OTRS-GIArticleSend
 # ---
-#        # Create article.
-#        $ArticleID = $ArticleBackendObject->ArticleCreate(
-#            NoAgentNotify => $Article->{NoAgentNotify} || 0,
-#            TicketID      => $TicketID,
-#            SenderTypeID  => $Article->{SenderTypeID}  || '',
-#            SenderType    => $Article->{SenderType}    || '',
-#            IsVisibleForCustomer => $Article->{IsVisibleForCustomer},
-#            From                 => $From,
-#            To                   => $To,
-#            Subject              => $Article->{Subject},
-#            Body                 => $Article->{Body},
-#            MimeType             => $Article->{MimeType} || '',
-#            Charset              => $Article->{Charset} || '',
-#            ContentType          => $Article->{ContentType} || '',
-#            UserID               => $Param{UserID},
-#            HistoryType          => $Article->{HistoryType},
-#            HistoryComment       => $Article->{HistoryComment} || '%%',
-#            AutoResponseType     => $Article->{AutoResponseType},
-#            UnlockOnAway         => $UnlockOnAway,
-#            OrigHeader           => {
-#                From    => $From,
-#                To      => $To,
-#                Subject => $Article->{Subject},
-#                Body    => $Article->{Body},
-#
-#            },
-#        );
+#         # Create article.
+#         $ArticleID = $ArticleBackendObject->ArticleCreate(
+#             NoAgentNotify => $Article->{NoAgentNotify} || 0,
+#             TicketID      => $TicketID,
+#             SenderTypeID  => $Article->{SenderTypeID}  || '',
+#             SenderType    => $Article->{SenderType}    || '',
+#             IsVisibleForCustomer => $Article->{IsVisibleForCustomer},
+#             From                 => $From,
+#             To                   => $To,
+#             Subject              => $Article->{Subject},
+#             Body                 => $Article->{Body},
+#             MimeType             => $Article->{MimeType} || '',
+#             Charset              => $Article->{Charset} || '',
+#             ContentType          => $Article->{ContentType} || '',
+#             UserID               => $Param{UserID},
+#             HistoryType          => $Article->{HistoryType},
+#             HistoryComment       => $Article->{HistoryComment} || '%%',
+#             AutoResponseType     => $Article->{AutoResponseType},
+#             UnlockOnAway         => $UnlockOnAway,
+#             OrigHeader           => {
+#                 From    => $From,
+#                 To      => $To,
+#                 Subject => $Article->{Subject},
+#                 Body    => $PlainBody,
+#             },
+#         );
 
         # If we are sending the article as an email, set the to address to the provided address.
         if ( $Article->{ArticleSend} ) {
@@ -2241,7 +2251,7 @@ sub _TicketUpdate {
                 From    => $From,
                 To      => $To,
                 Subject => $Subject,
-                Body    => $Article->{Body},
+                Body    => $PlainBody
             },
         );
 
@@ -2349,6 +2359,7 @@ sub _TicketUpdate {
 #     for my $Attachment ( @{$AttachmentList} ) {
 #         my $Result = $Self->CreateAttachment(
 #             Attachment => $Attachment,
+#             TicketID   => $TicketID,
 #             ArticleID  => $ArticleID || '',
 #             UserID     => $Param{UserID}
 #         );
@@ -2484,7 +2495,7 @@ sub _TicketUpdate {
     # add attachment if the request includes attachments
     if ( IsArrayRefWithData($AttachmentList) ) {
         my %AttachmentIndex = $ArticleBackendObject->ArticleAttachmentIndex(
-            ArticleID => $ArticleID,
+            ArticleID => $ArticleData{ArticleID},
         );
 
         my @Attachments;
@@ -2493,7 +2504,7 @@ sub _TicketUpdate {
         for my $FileID ( sort keys %AttachmentIndex ) {
             next ATTACHMENT if !$FileID;
             my %Attachment = $ArticleBackendObject->ArticleAttachment(
-                ArticleID => $ArticleID,
+                ArticleID => $ArticleData{ArticleID},
                 FileID    => $FileID,
             );
 

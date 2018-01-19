@@ -2,7 +2,7 @@
 # Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
 # Copyright (C) 2012-2018 Znuny GmbH, http://znuny.com/
 # --
-# $origin: otrs - 2be0a4540ffd992654d13728e82a63d9040e1a3a - Kernel/GenericInterface/Operation/Ticket/TicketCreate.pm
+# $origin: otrs - 4fe218beccdb926a29dd7bed9de48211430d69d0 - Kernel/GenericInterface/Operation/Ticket/TicketCreate.pm
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -465,8 +465,6 @@ sub Run {
 
     # isolate Article parameter
     my $Article = $Param{Data}->{Article};
-
-    # add UserType to Validate ArticleType
     $Article->{UserType} = $UserType;
 
     # remove leading and trailing spaces
@@ -858,8 +856,7 @@ sub _CheckArticle {
 
         # return internal server error
         return {
-            ErrorMessage => "TicketCreate: Article->AutoResponseType parameter is required and"
-                . " Sysconfig ArticleTypeID setting could not be read!"
+            ErrorMessage => "TicketCreate: Article->AutoResponseType parameter is required!"
         };
     }
 
@@ -1461,7 +1458,7 @@ sub _TicketCreate {
 #
 #     # use data from customer user (if customer user is in database)
 #     elsif ( IsHashRefWithData( \%CustomerUserData ) ) {
-#         $From = '"' . $CustomerUserData{UserFirstname} . ' ' . $CustomerUserData{UserLastname} . '"'
+#         $From = '"' . $CustomerUserData{UserFullname} . '"'
 #             . ' <' . $CustomerUserData{UserEmail} . '>';
 #     }
 #
@@ -1493,7 +1490,7 @@ sub _TicketCreate {
 
         # use data from customer user (if customer user is in database)
         elsif ( IsHashRefWithData( \%CustomerUserData ) ) {
-            $From = '"' . $CustomerUserData{UserFirstname} . ' ' . $CustomerUserData{UserLastname} . '"'
+            $From = '"' . $CustomerUserData{UserFullname} . '"'
                 . ' <' . $CustomerUserData{UserEmail} . '>';
         }
 
@@ -1517,44 +1514,6 @@ sub _TicketCreate {
 #             QueueID => $Ticket->{QueueID},
 #         );
 #     }
-#
-#    if ( !$Article->{CommunicationChannel} ) {
-#
-#        my %CommunicationChannel = $Kernel::OM->Get('Kernel::System::CommunicationChannel')->ChannelGet(
-#            ChannelID => $Article->{CommunicationChannelID},
-#        );
-#        $Article->{CommunicationChannel} = $CommunicationChannel{ChannelName};
-#    }
-#
-#    my $ArticleBackendObject = $Kernel::OM->Get('Kernel::System::Ticket::Article')->BackendForChannel(
-#        ChannelName => $Article->{CommunicationChannel},
-#    );
-#
-#    # Create article.
-#    my $ArticleID = $ArticleBackendObject->ArticleCreate(
-#        NoAgentNotify => $Article->{NoAgentNotify} || 0,
-#        TicketID      => $TicketID,
-#        SenderTypeID  => $Article->{SenderTypeID}  || '',
-#        SenderType    => $Article->{SenderType}    || '',
-#        IsVisibleForCustomer => $Article->{IsVisibleForCustomer},
-#        From                 => $From,
-#        To                   => $To,
-#        Subject              => $Article->{Subject},
-#        Body                 => $Article->{Body},
-#        MimeType             => $Article->{MimeType} || '',
-#        Charset              => $Article->{Charset} || '',
-#        ContentType          => $Article->{ContentType} || '',
-#        UserID               => $Param{UserID},
-#        HistoryType          => $Article->{HistoryType},
-#        HistoryComment       => $Article->{HistoryComment} || '%%',
-#        AutoResponseType     => $Article->{AutoResponseType},
-#        OrigHeader           => {
-#            From    => $From,
-#            To      => $To,
-#            Subject => $Article->{Subject},
-#            Body    => $Article->{Body},
-#        },
-#    );
 
     if ( $Article->{ArticleSend} ) {
         $To = $Article->{To};
@@ -1567,6 +1526,58 @@ sub _TicketCreate {
             QueueID => $Ticket->{QueueID},
         );
     }
+# ---
+
+    if ( !$Article->{CommunicationChannel} ) {
+
+        my %CommunicationChannel = $Kernel::OM->Get('Kernel::System::CommunicationChannel')->ChannelGet(
+            ChannelID => $Article->{CommunicationChannelID},
+        );
+        $Article->{CommunicationChannel} = $CommunicationChannel{ChannelName};
+    }
+
+    my $ArticleBackendObject = $Kernel::OM->Get('Kernel::System::Ticket::Article')->BackendForChannel(
+        ChannelName => $Article->{CommunicationChannel},
+    );
+
+    my $PlainBody = $Article->{Body};
+
+    # Convert article body to plain text, if HTML content was supplied. This is necessary since auto response code
+    #   expects plain text content. Please see bug#13397 for more information.
+    if ( $Article->{ContentType} =~ /text\/html/i || $Article->{MimeType} =~ /text\/html/i ) {
+        $PlainBody = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToAscii(
+            String => $Article->{Body},
+        );
+    }
+
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
+#     # Create article.
+#     my $ArticleID = $ArticleBackendObject->ArticleCreate(
+#         NoAgentNotify => $Article->{NoAgentNotify} || 0,
+#         TicketID      => $TicketID,
+#         SenderTypeID  => $Article->{SenderTypeID}  || '',
+#         SenderType    => $Article->{SenderType}    || '',
+#         IsVisibleForCustomer => $Article->{IsVisibleForCustomer},
+#         From                 => $From,
+#         To                   => $To,
+#         Subject              => $Article->{Subject},
+#         Body                 => $Article->{Body},
+#         MimeType             => $Article->{MimeType} || '',
+#         Charset              => $Article->{Charset} || '',
+#         ContentType          => $Article->{ContentType} || '',
+#         UserID               => $Param{UserID},
+#         HistoryType          => $Article->{HistoryType},
+#         HistoryComment       => $Article->{HistoryComment} || '%%',
+#         AutoResponseType     => $Article->{AutoResponseType},
+#         OrigHeader           => {
+#             From    => $From,
+#             To      => $To,
+#             Subject => $Article->{Subject},
+#             Body    => $PlainBody,
+#         },
+#     );
 
     my $Subject = $Article->{Subject};
     if ( $Article->{ArticleSend} ) {
@@ -1619,18 +1630,6 @@ sub _TicketCreate {
         $MimeType = $Article->{MimeType};
     }
 
-    if ( !$Article->{CommunicationChannel} ) {
-
-        my %CommunicationChannel = $Kernel::OM->Get('Kernel::System::CommunicationChannel')->ChannelGet(
-            ChannelID => $Article->{CommunicationChannelID},
-        );
-        $Article->{CommunicationChannel} = $CommunicationChannel{ChannelName};
-    }
-
-    my $ArticleBackendObject = $Kernel::OM->Get('Kernel::System::Ticket::Article')->BackendForChannel(
-        ChannelName => $Article->{CommunicationChannel},
-    );
-
     my %ArticleParams = (
         NoAgentNotify => $Article->{NoAgentNotify} || 0,
         TicketID      => $TicketID,
@@ -1652,7 +1651,7 @@ sub _TicketCreate {
             From    => $From,
             To      => $To,
             Subject => $Subject,
-            Body    => $Article->{Body},
+            Body    => $PlainBody,
         },
     );
 
@@ -1671,7 +1670,6 @@ sub _TicketCreate {
                     Content => MIME::Base64::decode_base64( $Attachment->{Content} ),
                 };
             }
-
             $ArticleParams{Attachment} = \@NewAttachments;
         }
 
@@ -1807,6 +1805,7 @@ sub _TicketCreate {
 #
 #         for my $Attachment ( @{$AttachmentList} ) {
 #             my $Result = $Self->CreateAttachment(
+#                 TicketID   => $TicketID,
 #                 Attachment => $Attachment,
 #                 ArticleID  => $ArticleID,
 #                 UserID     => $Param{UserID}

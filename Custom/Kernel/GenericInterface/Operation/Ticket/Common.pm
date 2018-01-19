@@ -2,7 +2,7 @@
 # Copyright (C) 2001-2018 OTRS AG, http://otrs.com/
 # Copyright (C) 2012-2018 Znuny GmbH, http://znuny.com/
 # --
-# $origin: otrs - 2be0a4540ffd992654d13728e82a63d9040e1a3a - Kernel/GenericInterface/Operation/Ticket/Common.pm
+# $origin: otrs - 91c2cc2962e5a03d6538ca68d6196c117a41a29d - Kernel/GenericInterface/Operation/Ticket/Common.pm
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
@@ -863,6 +863,7 @@ sub ValidateArticleCommunicationChannel {
 
     return 1;
 }
+
 # ---
 # Znuny4OTRS-GIArticleSend
 # ---
@@ -1171,7 +1172,44 @@ sub ValidateDynamicFieldValue {
         UserID             => 1,
     );
 
-    return $ValueType;
+    return if !$ValueType;
+
+    # Check if value parameter exists in config of possible values, for example for dropdown/multi-select fields.
+    #   Please see bug#13444 for more information.
+    if (
+        defined $Param{Value}
+        && length $Param{Value}
+        && (
+            IsArrayRefWithData( $DynamicFieldConfig->{Config}->{PossibleValues} )
+            || IsHashRefWithData( $DynamicFieldConfig->{Config}->{PossibleValues} )
+        )
+        )
+    {
+        my @Values;
+        if ( ref $Param{Value} eq 'ARRAY' ) {
+            @Values = @{ $Param{Value} };
+        }
+        else {
+            push @Values, $Param{Value};
+        }
+
+        if ( IsArrayRefWithData( $DynamicFieldConfig->{Config}->{PossibleValues} ) ) {
+            for my $Value (@Values) {
+                if ( !grep { $_ eq $Value } @{ $DynamicFieldConfig->{Config}->{PossibleValues} } ) {
+                    return;
+                }
+            }
+        }
+        else {
+            for my $Value (@Values) {
+                if ( !grep { $_ eq $Value } keys %{ $DynamicFieldConfig->{Config}->{PossibleValues} } ) {
+                    return;
+                }
+            }
+        }
+    }
+
+    return 1;
 }
 
 =head2 ValidateDynamicFieldObjectType()
