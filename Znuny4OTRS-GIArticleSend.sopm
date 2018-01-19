@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <otrs_package version="1.0">
     <Name>Znuny4OTRS-GIArticleSend</Name>
-    <Version>6.0.2</Version>
+    <Version>6.0.3</Version>
+    <ChangeLog Version="6.0.3" Date="2018-01-19 16:08:56 +0100">Updated customized OTRS files to latest version.</ChangeLog>
     <ChangeLog Version="6.0.2" Date="2018-01-17 09:32:50 +0100">Fixed creation of attachments (pull request #5, thanks to redrick).</ChangeLog>
     <ChangeLog Version="6.0.1" Date="2017-11-15 15:11:54 +0100">Initial release 6.0.x.</ChangeLog>
     <ChangeLog Version="5.0.4" Date="2016-11-24 09:13:19 +0100">added optional paramater for signing/encryption with S/MIME and PGP</ChangeLog>
