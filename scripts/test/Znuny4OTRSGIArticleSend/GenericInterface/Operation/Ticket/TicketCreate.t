@@ -27,7 +27,7 @@ my $ZnunyHelperObject        = $Kernel::OM->Get('Kernel::System::ZnunyHelper');
 my $UnitTestEmailObject      = $Kernel::OM->Get('Kernel::System::UnitTest::Email');
 
 my %UserData = $HelperObject->TestUserDataGet(
-    Groups => [ 'admin', 'users' ],
+    Groups   => [ 'admin', 'users' ],
     Language => 'de'
 );
 
