@@ -2121,6 +2121,14 @@ sub _TicketUpdate {
         # set Article To
         my $To = '';
 
+# ---
+# Znuny4OTRS-GIArticleSend
+# ---
+        # ArticleSend() is only possible for channel 'Email', so set it.
+        if ( $Article->{ArticleSend} ) {
+            $Article->{CommunicationChannel} = 'Email';
+        }
+# ---
         if ( !$Article->{CommunicationChannel} ) {
 
             my %CommunicationChannel = $Kernel::OM->Get('Kernel::System::CommunicationChannel')->ChannelGet(

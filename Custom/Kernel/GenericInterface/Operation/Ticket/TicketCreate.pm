@@ -1526,6 +1526,11 @@ sub _TicketCreate {
             QueueID => $Ticket->{QueueID},
         );
     }
+
+    # ArticleSend() is only possible for channel 'Email', so set it.
+    if ( $Article->{ArticleSend} ) {
+        $Article->{CommunicationChannel} = 'Email';
+    }
 # ---
 
     if ( !$Article->{CommunicationChannel} ) {
