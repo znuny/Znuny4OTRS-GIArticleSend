@@ -1,4 +1,5 @@
-# Send articles via Generic Interface
+# Functionality
+
 In OTRS it's not possible to send articles via the Generic Interface operations TicketCreate and TicketUpdate.
 This package extends OTRS to make this possible.
 

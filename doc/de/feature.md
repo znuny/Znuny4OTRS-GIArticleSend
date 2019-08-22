@@ -1,4 +1,5 @@
-# Versand von Artikeln über Generic-Interface
+# Funktionalität
+
 In OTRS ist es nicht möglich, über die mitgelieferten Generic-Interface-Operationen TicketCreate und TicketUpdate Artikel zu versenden.
 Das Paket Znuny4OTRS-GIArticleSend ermöglicht dies.
 

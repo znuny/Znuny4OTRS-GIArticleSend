@@ -1,6 +1,6 @@
 # --
-# Copyright (C) 2001-2018 OTRS AG, https://otrs.com/
-# Copyright (C) 2012-2018 Znuny GmbH, http://znuny.com/
+# Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
+# Copyright (C) 2012-2019 Znuny GmbH, http://znuny.com/
 # --
 # $origin: otrs - 91c2cc2962e5a03d6538ca68d6196c117a41a29d - Kernel/GenericInterface/Operation/Ticket/Common.pm
 # --
