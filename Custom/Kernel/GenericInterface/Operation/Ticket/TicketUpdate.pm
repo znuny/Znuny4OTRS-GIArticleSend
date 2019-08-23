@@ -2,7 +2,7 @@
 # Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
 # Copyright (C) 2012-2019 Znuny GmbH, http://znuny.com/
 # --
-# $origin: otrs - 4fe218beccdb926a29dd7bed9de48211430d69d0 - Kernel/GenericInterface/Operation/Ticket/TicketUpdate.pm
+# $origin: otrs - daad50a0cfe54012a40624f378c0ab509c30b7d6 - Kernel/GenericInterface/Operation/Ticket/TicketUpdate.pm
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -130,6 +130,8 @@ if applicable the created ArticleID.
 # Znuny4OTRS-GIArticleSend
 # ---
                 To                              => 'some to address',          # optional, required if ArticleSend => 1
+                Cc                              => 'some Cc address',          # optional
+                Bcc                             => 'some Bcc address',         # optional
 # ---
                 Subject                         => 'some subject',
                 Body                            => 'some body',
@@ -395,7 +397,7 @@ sub Run {
     my $PermissionUserID = $UserID;
 
     if ( $UserType eq 'Customer' ) {
-        $UserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
+        $UserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID');
     }
 
     # get ticket object
@@ -580,7 +582,7 @@ sub Run {
                 return {
                     Success => 0,
                     %{$ArticleCheck},
-                    }
+                };
             }
             return $Self->ReturnError( %{$ArticleCheck} );
         }
@@ -1523,7 +1525,7 @@ sub _CheckUpdatePermissions {
 
     return {
         Success => 1,
-        }
+    };
 }
 
 =head2 _TicketUpdate()
@@ -1611,7 +1613,7 @@ sub _TicketUpdate {
                 Success => 0,
                 Errormessage =>
                     'Ticket title could not be updated, please contact system administrator!',
-                }
+            };
         }
     }
 
@@ -1643,7 +1645,7 @@ sub _TicketUpdate {
                 Success => 0,
                 ErrorMessage =>
                     'Ticket queue could not be updated, please contact system administrator!',
-                }
+            };
         }
     }
 
@@ -1675,7 +1677,7 @@ sub _TicketUpdate {
                 Success => 0,
                 Errormessage =>
                     'Ticket lock could not be updated, please contact system administrator!',
-                }
+            };
         }
     }
 
@@ -1708,7 +1710,7 @@ sub _TicketUpdate {
                 Success => 0,
                 Errormessage =>
                     'Ticket type could not be updated, please contact system administrator!',
-                }
+            };
         }
     }
 
@@ -1764,14 +1766,14 @@ sub _TicketUpdate {
                         Errormessage =>
                             'Ticket pendig time could not be updated, please contact system'
                             . ' administrator!',
-                        }
+                    };
                 }
             }
             else {
                 return $Self->ReturnError(
                     ErrorCode    => 'TicketUpdate.MissingParameter',
                     ErrorMessage => 'Can\'t set a ticket on a pending state without pendig time!'
-                    )
+                );
             }
         }
 
@@ -1802,7 +1804,7 @@ sub _TicketUpdate {
                 Success => 0,
                 Errormessage =>
                     'Ticket state could not be updated, please contact system administrator!',
-                }
+            };
         }
     }
 
@@ -1868,7 +1870,7 @@ sub _TicketUpdate {
                 Success => 0,
                 Errormessage =>
                     'Ticket service could not be updated, please contact system administrator!',
-                }
+            };
         }
     }
 
@@ -1910,7 +1912,7 @@ sub _TicketUpdate {
                 Success => 0,
                 Errormessage =>
                     'Ticket SLA could not be updated, please contact system administrator!',
-                }
+            };
         }
     }
 
@@ -1954,7 +1956,7 @@ sub _TicketUpdate {
                 Success => 0,
                 Errormessage =>
                     'Ticket customer user could not be updated, please contact system administrator!',
-                }
+            };
         }
     }
 
@@ -1987,7 +1989,7 @@ sub _TicketUpdate {
                 Success => 0,
                 Errormessage =>
                     'Ticket priority could not be updated, please contact system administrator!',
-                }
+            };
         }
     }
 
@@ -2024,7 +2026,7 @@ sub _TicketUpdate {
                 Success => 0,
                 Errormessage =>
                     'Ticket owner could not be updated, please contact system administrator!',
-                }
+            };
         }
     }
 
@@ -2064,7 +2066,7 @@ sub _TicketUpdate {
                 Success => 0,
                 Errormessage =>
                     'Ticket responsible could not be updated, please contact system administrator!',
-                }
+            };
         }
     }
 
@@ -2118,8 +2120,17 @@ sub _TicketUpdate {
             $From = $UserData{UserFullname};
         }
 
-        # set Article To
-        my $To = '';
+        # Set Article To, Cc, Bcc.
+        my ( $To, $Cc, $Bcc );
+        if ( $Article->{To} ) {
+            $To = $Article->{To};
+        }
+        if ( $Article->{Cc} ) {
+            $Cc = $Article->{Cc};
+        }
+        if ( $Article->{Bcc} ) {
+            $Bcc = $Article->{Bcc};
+        }
 
 # ---
 # Znuny4OTRS-GIArticleSend
@@ -2129,6 +2140,22 @@ sub _TicketUpdate {
             $Article->{CommunicationChannel} = 'Email';
         }
 # ---
+
+        # Fallback for To
+        if ( !$To && $Article->{CommunicationChannel} eq 'Email' ) {
+
+            # Use data from customer user (if customer user is in database).
+            if ( IsHashRefWithData( \%CustomerUserData ) ) {
+                $To = '"' . $CustomerUserData{UserFullname} . '"'
+                    . ' <' . $CustomerUserData{UserEmail} . '>';
+            }
+
+            # Otherwise use customer user as sent from the request (it should be an email).
+            else {
+                $To = $Ticket->{CustomerUser} // $TicketData{CustomerUserID};
+            }
+        }
+
         if ( !$Article->{CommunicationChannel} ) {
 
             my %CommunicationChannel = $Kernel::OM->Get('Kernel::System::CommunicationChannel')->ChannelGet(
@@ -2156,13 +2183,15 @@ sub _TicketUpdate {
 # ---
 #         # Create article.
 #         $ArticleID = $ArticleBackendObject->ArticleCreate(
-#             NoAgentNotify => $Article->{NoAgentNotify} || 0,
-#             TicketID      => $TicketID,
-#             SenderTypeID  => $Article->{SenderTypeID}  || '',
-#             SenderType    => $Article->{SenderType}    || '',
+#             NoAgentNotify        => $Article->{NoAgentNotify} || 0,
+#             TicketID             => $TicketID,
+#             SenderTypeID         => $Article->{SenderTypeID} || '',
+#             SenderType           => $Article->{SenderType} || '',
 #             IsVisibleForCustomer => $Article->{IsVisibleForCustomer},
 #             From                 => $From,
 #             To                   => $To,
+#             Cc                   => $Cc,
+#             Bcc                  => $Bcc,
 #             Subject              => $Article->{Subject},
 #             Body                 => $Article->{Body},
 #             MimeType             => $Article->{MimeType} || '',
@@ -2180,11 +2209,6 @@ sub _TicketUpdate {
 #                 Body    => $PlainBody,
 #             },
 #         );
-
-        # If we are sending the article as an email, set the to address to the provided address.
-        if ( $Article->{ArticleSend} ) {
-            $To = $Article->{To};
-        }
 
         my $Subject = $Article->{Subject};
         if ( $Article->{ArticleSend} ) {
@@ -2238,24 +2262,26 @@ sub _TicketUpdate {
         }
 
         my %ArticleParams = (
-            NoAgentNotify => $Article->{NoAgentNotify} || 0,
-            TicketID      => $TicketID,
-            SenderTypeID  => $Article->{SenderTypeID}  || '',
-            SenderType    => $Article->{SenderType}    || '',
+            NoAgentNotify        => $Article->{NoAgentNotify} || 0,
+            TicketID             => $TicketID,
+            SenderTypeID         => $Article->{SenderTypeID}  || '',
+            SenderType           => $Article->{SenderType}    || '',
             IsVisibleForCustomer => $Article->{IsVisibleForCustomer},
-            From           => $From,
-            To             => $To,
-            Subject        => $Subject,
-            Body           => $Article->{Body},
-            MimeType       => $MimeType                  || '',
-            Charset        => $Charset                   || '',
-            ContentType    => $Article->{ContentType}    || '',
-            UserID         => $Param{UserID},
-            HistoryType    => $Article->{HistoryType},
-            HistoryComment => $Article->{HistoryComment} || '%%',
-            AutoResponseType => $Article->{AutoResponseType},
+            From                 => $From,
+            To                   => $To,
+            Cc                   => $Cc,
+            Bcc                  => $Bcc,
+            Subject              => $Subject,
+            Body                 => $Article->{Body},
+            MimeType             => $MimeType                  || '',
+            Charset              => $Charset                   || '',
+            ContentType          => $Article->{ContentType}    || '',
+            UserID               => $Param{UserID},
+            HistoryType          => $Article->{HistoryType},
+            HistoryComment       => $Article->{HistoryComment} || '%%',
+            AutoResponseType     => $Article->{AutoResponseType},
             UnlockOnAway         => $UnlockOnAway,
-            OrigHeader       => {
+            OrigHeader           => {
                 From    => $From,
                 To      => $To,
                 Subject => $Subject,
@@ -2324,7 +2350,7 @@ sub _TicketUpdate {
                 Success => 0,
                 ErrorMessage =>
                     'Article could not be created, please contact the system administrator'
-                }
+            };
         }
 
         # time accounting
@@ -2472,7 +2498,7 @@ sub _TicketUpdate {
 
     # get Article and ArticleAttachement
     my %ArticleData = $ArticleBackendObject->ArticleGet(
-        ArticleID => $ArticleID || $LastArticleID,
+        ArticleID     => $ArticleID || $LastArticleID,
         DynamicFields => 1,
         TicketID      => $TicketID,
     );
@@ -2518,8 +2544,8 @@ sub _TicketUpdate {
 
             next ATTACHMENT if !IsHashRefWithData( \%Attachment );
 
-            # convert content to base64
-            $Attachment{Content} = MIME::Base64::encode_base64( $Attachment{Content} );
+            # convert content to base64, but prevent 76 chars brake, see bug#14500.
+            $Attachment{Content} = MIME::Base64::encode_base64( $Attachment{Content}, '' );
             push @Attachments, {%Attachment};
         }
 

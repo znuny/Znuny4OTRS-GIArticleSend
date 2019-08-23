@@ -1,14 +1,16 @@
 # Funktionalität
 
-In OTRS ist es nicht möglich, über die mitgelieferten Generic-Interface-Operationen TicketCreate und TicketUpdate Artikel zu versenden.
-Das Paket Znuny4OTRS-GIArticleSend ermöglicht dies.
+Dieses Paket ermöglicht den Versand von Artikeln über die Generic-Interface-Operationen TicketCreate und TicketUpdate.
 
 ## Neue Artikelparameter
+
 Um einen Artikel zu versenden, müssen für die Operation TicketCreate oder TicketUpdate folgende Parameter in den Artikeldaten mitgegeben werden:
 
 ```
 ArticleSend => 1,
-To          => 'email@example.com', # E-Mail-Adresse, an die der Artikel versendet werden soll.
+To          => 'email@example.com',  # E-Mail-Adresse, an die der Artikel versendet werden soll.
+Cc          => 'email2@example.com', # Optional: Cc-E-Mail-Adresse, an die der Artikel versendet werden soll.
+Bcc         => 'email3@example.com', # Optional: Bcc-E-Mail-Adresse, an die der Artikel versendet werden soll.
 ```
 
 Zusätzlich können die so versendeten E-Mails signiert und verschlüsselt werden:

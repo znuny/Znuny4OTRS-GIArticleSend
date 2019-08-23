@@ -2,7 +2,7 @@
 # Copyright (C) 2001-2019 OTRS AG, https://otrs.com/
 # Copyright (C) 2012-2019 Znuny GmbH, http://znuny.com/
 # --
-# $origin: otrs - 4fe218beccdb926a29dd7bed9de48211430d69d0 - Kernel/GenericInterface/Operation/Ticket/TicketCreate.pm
+# $origin: otrs - 6cfd3aabcdcce0b7305ea3be51c73bd782ca4176 - Kernel/GenericInterface/Operation/Ticket/TicketCreate.pm
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (GPL). If you
@@ -136,6 +136,8 @@ perform TicketCreate Operation. This will return the created ticket number.
 # Znuny4OTRS-GIArticleSend
 # ---
                 To                              => 'some to address',          # optional, required if ArticleSend => 1
+                Cc                              => 'some Cc address',          # optional
+                Bcc                             => 'some Bcc address',         # optional
 # ---
                 Subject                         => 'some subject',
                 Body                            => 'some body',
@@ -387,7 +389,7 @@ sub Run {
 
     my $PermissionUserID = $UserID;
     if ( $UserType eq 'Customer' ) {
-        $UserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID')
+        $UserID = $Kernel::OM->Get('Kernel::Config')->Get('CustomerPanelUserID');
     }
 
     # check needed hashes
@@ -812,7 +814,7 @@ sub _CheckTicket {
     # if everything is OK then return Success
     return {
         Success => 1,
-        }
+    };
 }
 
 =head2 _CheckArticle()
@@ -1467,6 +1469,7 @@ sub _TicketCreate {
 #         $From = $Ticket->{CustomerUser};
 #     }
 
+
     # When we are sending the article as an email, set the from address to the ticket's system address
     if (
         $Article->{ArticleSend}
@@ -1515,8 +1518,13 @@ sub _TicketCreate {
 #         );
 #     }
 
+    my $Cc;
+    my $Bcc;
+
     if ( $Article->{ArticleSend} ) {
-        $To = $Article->{To};
+        $To  = $Article->{To};
+        $Cc  = $Article->{Cc};
+        $Bcc = $Article->{Bcc};
     }
     elsif ( $Ticket->{Queue} ) {
         $To = $Ticket->{Queue};
@@ -1560,10 +1568,10 @@ sub _TicketCreate {
 # ---
 #     # Create article.
 #     my $ArticleID = $ArticleBackendObject->ArticleCreate(
-#         NoAgentNotify => $Article->{NoAgentNotify} || 0,
-#         TicketID      => $TicketID,
-#         SenderTypeID  => $Article->{SenderTypeID}  || '',
-#         SenderType    => $Article->{SenderType}    || '',
+#         NoAgentNotify        => $Article->{NoAgentNotify} || 0,
+#         TicketID             => $TicketID,
+#         SenderTypeID         => $Article->{SenderTypeID} || '',
+#         SenderType           => $Article->{SenderType} || '',
 #         IsVisibleForCustomer => $Article->{IsVisibleForCustomer},
 #         From                 => $From,
 #         To                   => $To,
@@ -1643,6 +1651,8 @@ sub _TicketCreate {
         IsVisibleForCustomer => $Article->{IsVisibleForCustomer},
         From           => $From,
         To             => $To,
+        Cc             => $Cc,
+        Bcc            => $Bcc,
         Subject        => $Subject,
         Body           => $Article->{Body},
         MimeType       => $MimeType                  || '',
@@ -1842,7 +1852,7 @@ sub _TicketCreate {
             Success      => 0,
             ErrorMessage => 'Could not get new ticket information, please contact the system'
                 . ' administrator',
-            }
+        };
     }
 
     # get web service configuration
@@ -1935,8 +1945,8 @@ sub _TicketCreate {
 
             next ATTACHMENT if !IsHashRefWithData( \%Attachment );
 
-            # convert content to base64
-            $Attachment{Content} = MIME::Base64::encode_base64( $Attachment{Content} );
+            # convert content to base64, but prevent 76 chars brake, see bug#14500.
+            $Attachment{Content} = MIME::Base64::encode_base64( $Attachment{Content}, '' );
             push @Attachments, {%Attachment};
         }
 

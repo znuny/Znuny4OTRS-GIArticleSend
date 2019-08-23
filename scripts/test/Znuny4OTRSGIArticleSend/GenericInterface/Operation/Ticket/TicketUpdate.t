@@ -60,6 +60,8 @@ my $Response = $UnitTestWebserviceObject->Process(
             HistoryComment       => '% % ',
             ArticleSend          => 1,
             To                   => 'rs+GIArticleSend@znuny.com',
+            Cc                   => 'jp+GIArticleSend@znuny.com',
+            Bcc                  => 'jp2+GIArticleSend@znuny.com',
         },
         Attachment => [
             {
@@ -84,11 +86,30 @@ $Self->True(
 
 my @Emails = $UnitTestEmailObject->EmailGet();
 
+my $CcFound;
+EMAIL:
+for my $Email (@Emails) {
+    next EMAIL if !$Email->{Header};
+    next EMAIL if $Email->{Header} !~ m{^CC:\s*jp\+GIArticleSend\@znuny\.com$}sm;
+
+    $CcFound = 1;
+    last EMAIL;
+}
+
+$Self->True(
+    $CcFound,
+    'Sent email must contain expected Cc address.',
+);
+
 $UnitTestEmailObject->EmailValidate(
     UnitTestObject => $Self,
     Message        => 'ticket update triggered ArticleSend functionality.',
     Email          => \@Emails,
-    ToArray        => 'rs+GIArticleSend@znuny.com',
+    ToArray        => [
+        'rs+GIArticleSend@znuny.com',     # To
+        'jp+GIArticleSend@znuny.com',     # Cc
+        'jp2+GIArticleSend@znuny.com',    # Bcc (not testable like Cc above)
+    ],
 );
 
 #
