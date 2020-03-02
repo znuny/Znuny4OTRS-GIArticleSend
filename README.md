@@ -1,4 +1,7 @@
-![Znuny logo](http://znuny.com/assets/images/logo_small.png)
+![Znuny logo](https://www.znuny.com/assets/images/logo_small.png)
+
+
+![Build status](https://badge.proxy.znuny.com/Znuny4OTRS-GIArticleSend/master)
 
 Znuny4OTRS-GIArticleSend
 ========================
@@ -6,6 +9,20 @@ This package enables the standard Generic Interface ticket operations to send ar
 
 This feature is based on OTRS [pull request #815](https://github.com/OTRS/otrs/pull/815) by github user [fredericve](https://github.com/fredericve).
 Also many thanks to [PC-College](https://www.pc-college.de/) who made this package possible.
+
+**Prerequisites**
+
+- OTRS 6
+- [Znuny4OTRS-Repo](https://www.znuny.com/add-ons/znuny4otrs-repository)
+
+**Installation**
+
+Download the [package](https://addons.znuny.com/api/addon_repos/public/1092/latest) and install it via admin interface -> package manager or use [Znuny4OTRS-Repo](https://www.znuny.com/add-ons/znuny4otrs-repository).
+
+**Download**
+
+Download the [latest version](https://addons.znuny.com/api/addon_repos/public/1092/latest).
+
 
 **Usage**
 To send an article via operation TicketCreate or TicketUpdate, you have to set the following new parameters within the article data:
@@ -15,26 +32,12 @@ ArticleSend => 1,
 To          => 'email@example.com', # Email address to send article to.
 ```
 
-**Prerequisites**
-
-- Znuny4OTRS-Repo
-
-- OTRS 6
-
-**Installation**
-
-Download the package and install it via admin interface -> package manager or use Znuny4OTRS-Repo.
-
-**Download**
-
-For download see [http://znuny.com/en/#!/addons](http://znuny.com/en/#!/addons)
-
 **Commercial Support**
 
-For this extension and for OTRS in general visit [http://znuny.com](http://znuny.com). Looking forward to hear from you!
+For this add-on and for OTRS in general visit [https://www.znuny.com](https://www.znuny.com). Looking forward to hear from you!
 
 Enjoy!
 
- Your Znuny Team!
+Your Znuny Team!
 
- [http://znuny.com/](http://znuny.com/)
+[https://www.znuny.com](https://www.znuny.com)
