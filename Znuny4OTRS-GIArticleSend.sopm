@@ -13,7 +13,7 @@
     <ChangeLog Version="5.0.2" Date="2016-10-27 10:58:23 +0200">Updated to latest OTRS 5 framework version.</ChangeLog>
     <ChangeLog Version="5.0.1" Date="2016-10-12 12:05:40 +0200">Initial release 5.0.x.</ChangeLog>
     <Framework>6.0.x</Framework>
-    <PackageRequired Version="6.0.46">Znuny4OTRS-Repo</PackageRequired>
+    <PackageRequired Version="6.0.71">Znuny4OTRS-Repo</PackageRequired>
     <Vendor>Znuny GmbH</Vendor>
     <URL>http://znuny.com/</URL>
     <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
