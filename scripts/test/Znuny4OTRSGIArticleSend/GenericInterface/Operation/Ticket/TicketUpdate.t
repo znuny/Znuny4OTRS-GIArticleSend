@@ -20,11 +20,27 @@ $Kernel::OM->ObjectParamAdd(
     },
 );
 
-# get needed objects
 my $HelperObject             = $Kernel::OM->Get('Kernel::System::UnitTest::Helper');
 my $UnitTestWebserviceObject = $Kernel::OM->Get('Kernel::System::UnitTest::Webservice');
 my $ZnunyHelperObject        = $Kernel::OM->Get('Kernel::System::ZnunyHelper');
 my $UnitTestEmailObject      = $Kernel::OM->Get('Kernel::System::UnitTest::Email');
+my $QueueObject              = $Kernel::OM->Get('Kernel::System::Queue');
+
+$UnitTestEmailObject->MailCleanup();
+
+my %Queue = $QueueObject->QueueGet(
+    Name => 'Misc',
+);
+my $Signature = $QueueObject->GetSignature(
+    QueueID => $Queue{QueueID}
+);
+
+if ( $Signature =~ m{Your Ticket-Team}m ) {
+    $Self->True(
+        $Signature,
+        "Signature of Queue Misc: $Signature",
+    );
+}
 
 my %UserData = $HelperObject->TestUserDataGet(
     Groups   => [ 'admin', 'users' ],
@@ -35,7 +51,9 @@ $ZnunyHelperObject->_WebserviceCreate(
     SubDir => 'Znuny4OTRSGIArticleSend',
 );
 
-my $TicketID = $HelperObject->TicketCreate();
+my $TicketID = $HelperObject->TicketCreate(
+    Queue => 'Misc',
+);
 
 my $Response = $UnitTestWebserviceObject->Process(
     UnitTestObject => $Self,
@@ -110,12 +128,10 @@ $UnitTestEmailObject->EmailValidate(
         'jp+GIArticleSend@znuny.com',     # Cc
         'jp2+GIArticleSend@znuny.com',    # Bcc (not testable like Cc above)
     ],
+    Body => qr{Your Ticket-Team}m,
 );
 
-#
 # test with no To-email
-#
-
 $UnitTestEmailObject->MailCleanup();
 
 $Response = $UnitTestWebserviceObject->Process(

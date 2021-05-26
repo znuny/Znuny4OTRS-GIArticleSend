@@ -2233,6 +2233,22 @@ sub _TicketUpdate {
                         'The subject for the e-mail could not be generated. Please contact the system administrator'
                 };
             }
+
+            my $Signature = $Kernel::OM->Get('Kernel::System::TemplateGenerator')->Signature(
+                TicketID => $TicketID,
+                UserID   => $Param{UserID},
+                Data     => $Article,
+            );
+
+            if ($Signature){
+                $Article->{Body} = $Article->{Body} . $Signature;
+
+                if ( $Article->{ContentType} =~ /text\/html/i || $Article->{MimeType} =~ /text\/html/i ) {
+                    $PlainBody = $Kernel::OM->Get('Kernel::System::HTMLUtils')->ToAscii(
+                        String => $Article->{Body},
+                    );
+                }
+            }
         }
 
         # Build Charset if needed (ArticleSend doesn't accept ContentType)
