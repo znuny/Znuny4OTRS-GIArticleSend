@@ -12,7 +12,7 @@ Also many thanks to [PC-College](https://www.pc-college.de/) who made this packa
 
 **Prerequisites**
 
-- OTRS 6
+- Znuny LTS 6, ((OTRS)) Community Edition 6 or OTRS 6
 - [Znuny4OTRS-Repo](https://www.znuny.com/add-ons/znuny4otrs-repository)
 
 **Installation**
@@ -34,7 +34,7 @@ To          => 'email@example.com', # Email address to send article to.
 
 **Commercial Support**
 
-For this add-on and for OTRS in general visit [https://www.znuny.com](https://www.znuny.com). Looking forward to hear from you!
+For this add-on and for Znuny in general visit [https://www.znuny.com](https://www.znuny.com). Looking forward to hear from you!
 
 Enjoy!
 
