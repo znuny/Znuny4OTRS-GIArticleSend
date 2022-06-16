@@ -132,6 +132,9 @@ if applicable the created ArticleID.
                 To                              => 'some to address',          # optional, required if ArticleSend => 1
                 Cc                              => 'some Cc address',          # optional
                 Bcc                             => 'some Bcc address',         # optional
+                InReplyTo                       => 'id email we're replying',  # optional
+                References                      => 'email id references',      # optional
+
 # ---
                 Subject                         => 'some subject',
                 Body                            => 'some body',
@@ -2222,7 +2225,7 @@ sub _TicketUpdate {
             $Subject = $TicketObject->TicketSubjectBuild(
                 TicketNumber => $TicketNumber,
                 Subject      => $Article->{Subject},
-                Type         => 'New',
+                Type         => 'Other',
                 Action       => 'Reply',
             );
 
@@ -2292,6 +2295,8 @@ sub _TicketUpdate {
             MimeType             => $MimeType                  || '',
             Charset              => $Charset                   || '',
             ContentType          => $Article->{ContentType}    || '',
+            InReplyTo            => $Article->{InReplyTo} || $Article->{"In-Reply-To"},
+            References           => $Article->{References},
             UserID               => $Param{UserID},
             HistoryType          => $Article->{HistoryType},
             HistoryComment       => $Article->{HistoryComment} || '%%',
