@@ -2292,6 +2292,8 @@ sub _TicketUpdate {
             MimeType             => $MimeType                  || '',
             Charset              => $Charset                   || '',
             ContentType          => $Article->{ContentType}    || '',
+            InReplyTo            => $Article->{InReplyTo},
+            References           => $Article->{References},
             UserID               => $Param{UserID},
             HistoryType          => $Article->{HistoryType},
             HistoryComment       => $Article->{HistoryComment} || '%%',
